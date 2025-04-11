@@ -3,6 +3,7 @@ from stmol import showmol
 import py3Dmol
 import requests
 import biotite.structure.io as bsio
+import re
 
 # --- Config ---
 st.set_page_config(layout='wide')
@@ -80,6 +81,8 @@ if predict and sequence:
     seq_length = len(sequence)
     confidence = get_confidence(plddt)
 
+    st.session_state.plddts = struct.b_factor.tolist()
+
     tab1, tab2, tab3 = st.tabs(["3D Structure", "Sequence Analysis", "PDB Data"])
 
     with tab1:
@@ -92,8 +95,31 @@ if predict and sequence:
         col3.metric("Confidence", confidence)
 
     with tab2:
-        st.subheader("Sequence Analysis")
-        st.code(sequence)
+        st.subheader('Sequence Analysis')
+
+        # Display pLDDT chart
+        if st.session_state.plddts:
+            st.write("### pLDDT per Residue")
+            st.write("pLDDT (predicted Local Distance Difference Test) is a per-residue estimate of the confidence in prediction on a scale from 0-100.")
+            st.write("- 90+ : Very high confidence")
+            st.write("- 70-90: High confidence")
+            st.write("- 50-70: Medium confidence")
+            st.write("- Below 50: Low confidence")
+
+            # Plot pLDDT values
+            plddt_chart_data = {"residue": list(range(1, len(st.session_state.plddts) + 1)), "pLDDT": st.session_state.plddts}
+            st.line_chart(plddt_chart_data, x="residue", y="pLDDT")
+
+        # Display amino acid composition
+        if sequence_input:
+            clean_seq = re.sub(r'[^A-Za-z]', '', sequence_input)
+            aa_counts = {}
+            for aa in clean_seq:
+                aa_counts[aa] = aa_counts.get(aa, 0) + 1
+
+            st.write("### Amino Acid Composition")
+            aa_data = {"Amino Acid": list(aa_counts.keys()), "Count": list(aa_counts.values())}
+            st.bar_chart(aa_data, x="Amino Acid")
 
     with tab3:
         st.subheader("PDB Format Data")
