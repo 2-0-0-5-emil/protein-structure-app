@@ -4,6 +4,7 @@ import py3Dmol
 import requests
 import biotite.structure.io as bsio
 import re
+import pandas as pd
 
 # --- Config ---
 st.set_page_config(layout='wide')
@@ -107,19 +108,19 @@ if predict and sequence:
             st.write("- Below 50: Low confidence")
 
             # Plot pLDDT values
-            plddt_chart_data = {"residue": list(range(1, len(st.session_state.plddts) + 1)), "pLDDT": st.session_state.plddts}
-            st.line_chart(plddt_chart_data, x="residue", y="pLDDT")
+            plddt_chart_data = pd.DataFrame({"residue": list(range(1, len(st.session_state.plddts) + 1)), "pLDDT": st.session_state.plddts})
+            st.line_chart(plddt_chart_data.set_index("residue"))
 
         # Display amino acid composition
-        if sequence_input:
-            clean_seq = re.sub(r'[^A-Za-z]', '', sequence_input)
+        if sequence:
+            clean_seq = re.sub(r'[^A-Za-z]', '', sequence)
             aa_counts = {}
             for aa in clean_seq:
                 aa_counts[aa] = aa_counts.get(aa, 0) + 1
 
             st.write("### Amino Acid Composition")
-            aa_data = {"Amino Acid": list(aa_counts.keys()), "Count": list(aa_counts.values())}
-            st.bar_chart(aa_data, x="Amino Acid")
+            aa_data = pd.DataFrame({"Amino Acid": list(aa_counts.keys()), "Count": list(aa_counts.values())})
+            st.bar_chart(aa_data.set_index("Amino Acid"))
 
     with tab3:
         st.subheader("PDB Format Data")
