@@ -48,7 +48,7 @@ example_sequences = {
     "Human Hemoglobin (complex)": "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR"
 }
 
-selected_example = st.sidebar.selectbox("Or select an example protein", options=list(example_sequences.keys()))
+selected_example = st.sidebar.selectbox("Select an example protein", options=list(example_sequences.keys()))
 sequence_input = example_sequences[selected_example]
 
 if selected_example == "Current sequence":
