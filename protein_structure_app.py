@@ -38,12 +38,24 @@ st.markdown('---')
 
 # Sidebar Inputs
 st.sidebar.title('Protein Input & Settings')
-def_seq = "MGSSHHHHHHSSGLVPRGSHMRGPNPTAASLEASAGPFTVRSFTVSRPSGYGAGTVYYPTNAGGTVGAIAIVPGYTARQSSIKWWGPRLASHGFVVITIDTNSTLDQPSSRSSQQMAALRQVASLNGTSSSPIYGKVDTARMGVMGWSMGGGGSLISAANNPSLKAAAPQAPWDSSTNFSSVTVPTLIFACENDSIAPVNSSALPIYDSMSRNAKQFLEINGGSHSCANSGNSNQALIGKKGVAWMKRFMDNDTRYSTFACENPNSTRVSDFRTANCSLEDPAANKARKEAELAAATAEQ"
 
-example_btn = st.sidebar.button("Use Example Protein")
-if example_btn:
-    st.session_state.sequence = def_seq
-sequence = st.sidebar.text_area("Enter Protein Sequence", st.session_state.get("sequence", ""), height=250)
+example_sequences = {
+    "Current sequence": "",
+    "T4 Lysozyme (small)": "MNIFEMLRIDEGLRLKIYKDTEGYYTIGIGHLLTKSPSLNAAKSELDKAIGRNTNGVITKDEAEKLFNQDVDAAVRGILRNAKLKPVYDSLDAVRRAALINMVFQMGETGVAGFTNSLRMLQQKRWDEAAVNLAKSRWYNQTPNRAKRVITTFRTGTWDAYKNL",
+    "GFP (medium)": "MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTFSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK",
+    "Human Hemoglobin (complex)": "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR"
+}
+
+selected_example = st.sidebar.selectbox("Or select an example protein", options=list(example_sequences.keys()))
+sequence_input = example_sequences[selected_example]
+
+if selected_example == "Current sequence":
+    sequence_input = st.session_state.get("sequence", "")
+    st.session_state.sequence = sequence_input
+else:
+    st.session_state.sequence = sequence_input
+
+sequence = st.sidebar.text_area("Enter Protein Sequence", sequence_input, height=250)
 
 # Visualization settings
 st.sidebar.title("🔧 Visualization Options")
