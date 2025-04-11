@@ -51,8 +51,9 @@ color_scheme = st.sidebar.selectbox("Color Scheme", ["spectrum", "chain", "resid
 spin = st.sidebar.checkbox("Spin Structure", value=True)
 reset = st.sidebar.button("Reset", type="primary")
 if reset:
-    st.session_state.clear()
-    st.experimental_rerun()
+    for key in st.session_state.keys():
+        del st.session_state[key]
+    st.rerun()
 
 predict = st.sidebar.button("Predict Structure")
 
@@ -72,7 +73,7 @@ if predict and sequence:
     with tab1:
         st.subheader("Predicted Protein Structure")
         render_mol(pdb_string, color_scheme=color_scheme, spin=spin)
-        
+
         col1, col2, col3 = st.columns(3)
         col1.metric("Sequence Length", seq_length)
         col2.metric("Average pLDDT", plddt)
