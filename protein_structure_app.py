@@ -6,10 +6,10 @@ import biotite.structure.io as bsio
 import re
 import pandas as pd
 
-# --- Config ---
+
 st.set_page_config(layout='wide')
 
-# --- Helper Functions ---
+
 def render_mol(pdb, color_scheme='spectrum', spin=True):
     pdbview = py3Dmol.view()
     pdbview.addModel(pdb, 'pdb')
@@ -34,11 +34,10 @@ def fetch_prediction(sequence):
     response = requests.post('https://api.esmatlas.com/foldSequence/v1/pdb/', headers=headers, data=sequence)
     return response.content.decode('utf-8')
 
-# --- UI ---
 st.title('🔬 Protein Structure Predictor using ESMFold')
 st.markdown('---')
 
-# Sidebar Inputs
+
 st.sidebar.title('Protein Input & Settings')
 
 example_sequences = {
@@ -59,7 +58,7 @@ else:
 
 sequence = st.sidebar.text_area("Enter Protein Sequence", sequence_input, height=250)
 
-# Visualization settings
+
 st.sidebar.title("🔧 Visualization Options")
 color_scheme = st.sidebar.selectbox("Color Scheme", ["spectrum", "chain", "residue", "secondary structure"])
 spin = st.sidebar.checkbox("Spin Structure", value=True)
@@ -71,7 +70,7 @@ if reset:
 
 predict = st.sidebar.button("Predict Structure")
 
-# Main App Tabs
+
 if predict and sequence:
     pdb_string = fetch_prediction(sequence)
     with open('predicted.pdb', 'w') as f:
@@ -98,7 +97,7 @@ if predict and sequence:
     with tab2:
         st.subheader('Sequence Analysis')
 
-        # Display pLDDT chart
+
         if st.session_state.plddts:
             st.write("### pLDDT per Residue")
             st.write("pLDDT (predicted Local Distance Difference Test) is a per-residue estimate of the confidence in prediction on a scale from 0-100.")
@@ -107,11 +106,11 @@ if predict and sequence:
             st.write("- 50-70: Medium confidence")
             st.write("- Below 50: Low confidence")
 
-            # Plot pLDDT values
+
             plddt_chart_data = pd.DataFrame({"residue": list(range(1, len(st.session_state.plddts) + 1)), "pLDDT": st.session_state.plddts})
             st.line_chart(plddt_chart_data.set_index("residue"))
 
-        # Display amino acid composition
+
         if sequence:
             clean_seq = re.sub(r'[^A-Za-z]', '', sequence)
             aa_counts = {}
