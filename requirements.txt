@@ -1,11 +1,6 @@
 streamlit
-stmol==0.0.9
 py3Dmol
+stmol
 biotite
-ipywidgets
-ipython_genutils
-matplotlib
+pandas
 requests
-re
-panda
-numpy
