@@ -5,3 +5,7 @@ biotite
 ipywidgets
 ipython_genutils
 matplotlib
+requests
+re
+panda
+numpy
