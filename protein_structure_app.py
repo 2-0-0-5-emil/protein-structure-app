@@ -37,6 +37,16 @@ def fetch_prediction(sequence):
 st.title('🔬 Protein Structure Predictor using ESMFold')
 st.markdown('---')
 
+# ✅ Hero Introduction Section
+st.markdown("""
+<div style='background-color: #f0f8ff; padding: 20px; border-radius: 10px; margin-bottom: 20px;'>
+    <h2 style='color: #333;'>Welcome to the Protein Structure Predictor</h2>
+    <p style='font-size: 16px; color: #555;'>
+        This tool uses cutting-edge AI (ESMFold) to predict the 3D structure of proteins directly from their amino acid sequences.
+        Simply paste your sequence or choose a sample from the sidebar to get started.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
 st.sidebar.title('Protein Input & Settings')
 
