@@ -49,6 +49,7 @@ body, .stApp, [data-testid="stSidebar"] {
 }
 
 /* Sidebar top bar white area to align with Streamlit top taskbar */
+/* Removed border-radius for square corners */
 [data-testid="stSidebar"]::before {
     content: "";
     position: absolute;
@@ -58,8 +59,8 @@ body, .stApp, [data-testid="stSidebar"] {
     height: 48px; /* Approximate height of Streamlit top bar */
     background-color: white !important;
     z-index: 1000;
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
+    /* border-bottom-left-radius: 8px;  Removed for square corners */
+    /* border-bottom-right-radius: 8px; Removed for square corners */
 }
 
 /* Adjust sidebar content to not overlap the white top bar */
@@ -234,6 +235,25 @@ hr {margin: 0.7rem 0;}
 .protein-card .protein-btn:hover {
     background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
 }
+
+/* Video background on main page only */
+.video-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    min-width: 100vw;
+    min-height: 100vh;
+    width: auto;
+    height: auto;
+    z-index: -1;
+    object-fit: cover;
+    opacity: 0.20; /* adjust opacity as needed */
+    pointer-events: none;
+}
+.main-content {
+    position: relative;
+    z-index: 1;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -349,6 +369,15 @@ def fetch_prediction(sequence):
 
 # ====== MAIN CONTENT AREA ======
 if not st.session_state.prediction_made:
+    # Video background for main page only
+    st.markdown(f"""
+    <video class="video-bg" autoplay loop muted playsinline>
+      <source src="https://raw.githubusercontent.com/2-0-0-5-emil/protein-structure-app/main/wall%20(1).mp4" type="video/mp4">
+    </video>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="main-content">', unsafe_allow_html=True)
+
     st.markdown("""
     <div class="custom-header">
         <h1 style="margin: 0;">Protein Structure Predictor</h1>
@@ -374,6 +403,8 @@ if not st.session_state.prediction_made:
             
             if st.button(f"Predict this protein", key=f"predict_{protein_name}_btn"):
                 run_prediction_for_sequence(protein_info["sequence"])
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 else:
     sequence = st.session_state.sequence
