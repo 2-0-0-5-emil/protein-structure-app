@@ -7,16 +7,16 @@ import re
 import pandas as pd
 
 # ====== SESSION STATE INITIALIZATION ======
-if "prediction_made" not in st.session_state:
-    st.session_state.prediction_made = False
-if "sequence" not in st.session_state:
-    st.session_state.sequence = ""
-if "color_scheme" not in st.session_state:
-    st.session_state.color_scheme = "spectrum"
-if "spin" not in st.session_state:
-    st.session_state.spin = True
-if "plddts" not in st.session_state:
-    st.session_state.plddts = []
+# Initialize all session state keys with defaults at the very start
+for key, default_value in {
+    "prediction_made": False,
+    "sequence": "",
+    "color_scheme": "spectrum",
+    "spin": True,
+    "plddts": []
+}.items():
+    if key not in st.session_state:
+        st.session_state[key] = default_value
 
 # ====== CUSTOM CSS & PAGE CONFIG ======
 st.set_page_config(
@@ -220,15 +220,15 @@ hr {margin: 0.7rem 0;}
 protein_templates = {
     "T4 Lysozyme (small)": {
         "sequence": "MNIFEMLRIDEGLRLKIYKDTEGYYTIGIGHLLTKSPSLNAAKSELDKAIGRNTNGVITKDEAEKLFNQDVDAAVRGILRNAKLKPVYDSLDAVRRAALINMVFQMGETGVAGFTNSLRMLQQKRWDEAAVNLAKSRWYNQTPNRAKRVITTFRTGTWDAYKNL",
-        "image_url": "https://files.rcsb.org/view/2LZM_mol.png"
+        "image_url": "https://raw.githubusercontent.com/2-0-0-5-emil/protein-structure-app/main/lyzo.jpeg"
     },
     "GFP (medium)": {
         "sequence": "MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTFSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK",
-        "image_url": "https://files.rcsb.org/view/1EMA_mol.png"
+        "image_url": "https://raw.githubusercontent.com/2-0-0-5-emil/protein-structure-app/main/gfp.jpeg"
     },
     "Human Hemoglobin (complex)": {
         "sequence": "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
-        "image_url": "https://files.rcsb.org/view/1A3N_mol.png"
+        "image_url": "https://raw.githubusercontent.com/2-0-0-5-emil/protein-structure-app/main/human.jpeg"
     }
 }
 
@@ -287,11 +287,18 @@ with st.sidebar:
         st.session_state.prediction_made = True
         st.session_state.sequence = st.session_state.seq_input
 
-    # Reset button clears all session state keys (without deprecated rerun)
+    # ====== RESET BUTTON HANDLER ======
+    # Clear all session state keys and then re-initialize critical keys to avoid AttributeError
     if reset:
         keys_to_clear = list(st.session_state.keys())
         for key in keys_to_clear:
             del st.session_state[key]
+        # Re-initialize critical keys immediately after clearing
+        st.session_state.prediction_made = False
+        st.session_state.sequence = ""
+        st.session_state.color_scheme = "spectrum"
+        st.session_state.spin = True
+        st.session_state.plddts = []
 
 # ====== FUNCTION TO RUN PREDICTION AND SET STATE ======
 def run_prediction_for_sequence(seq):
@@ -345,10 +352,13 @@ if not st.session_state.prediction_made:
             st.markdown(f"""
             <div class="protein-card">
                 <div class="protein-title">{protein_name}</div>
-                <img src="{protein_info['image_url']}" alt="{protein_name}" width="100%" />
             </div>
             """, unsafe_allow_html=True)
-            # If predict button in template is clicked:
+            
+            # Display image from your GitHub raw URLs
+            st.image(protein_info['image_url'], use_column_width=True)
+            
+            # Predict button below the image
             if st.button(f"Predict this protein", key=f"predict_{protein_name}_btn"):
                 run_prediction_for_sequence(protein_info["sequence"])
 
@@ -399,7 +409,6 @@ else:
                 - Below 50: Low confidence
                 """)
 
-                # FIX: Set index to 'residue' (not 'Amino Acid') for pLDDT line chart
                 plddt_chart_data = pd.DataFrame({
                     "residue": list(range(1, len(st.session_state.plddts) + 1)), 
                     "pLDDT": st.session_state.plddts
@@ -417,7 +426,6 @@ else:
                     "Amino Acid": list(aa_counts.keys()), 
                     "Count": list(aa_counts.values())
                 })
-                # Ensure correct column name 'Amino Acid' is used here
                 st.bar_chart(aa_data.set_index("Amino Acid"))
 
         with tab3:
