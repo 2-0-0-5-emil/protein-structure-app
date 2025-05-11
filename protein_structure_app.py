@@ -233,6 +233,19 @@ protein_templates = {
     }
 }
 
+# ====== SESSION STATE INITIALIZATION ======
+# Initialize all session state variables at the very start to avoid AttributeErrors
+if "prediction_made" not in st.session_state:
+    st.session_state.prediction_made = False
+if "sequence" not in st.session_state:
+    st.session_state.sequence = ""
+if "color_scheme" not in st.session_state:
+    st.session_state.color_scheme = "spectrum"
+if "spin" not in st.session_state:
+    st.session_state.spin = True
+if "plddts" not in st.session_state:
+    st.session_state.plddts = []
+
 # ====== SIDEBAR CONTROLS ======
 with st.sidebar:
     st.markdown("""
@@ -282,6 +295,11 @@ with st.sidebar:
 
     predict_clicked = st.button("Predict Structure", key="predict_button", type="primary")
     reset = st.button("Reset", key="reset")
+
+    # If predict button in sidebar is clicked:
+    if predict_clicked:
+        st.session_state.prediction_made = True
+        st.session_state.sequence = st.session_state.seq_input
 
     # Reset button clears all session state keys (without deprecated rerun)
     if reset:
@@ -344,9 +362,10 @@ if not st.session_state.prediction_made:
                 <img src="{protein_info['image_url']}" alt="{protein_name}" width="100%" />
             </div>
             """, unsafe_allow_html=True)
-            # Button below the card
+            # If predict button in template is clicked:
             if st.button(f"Predict this protein", key=f"predict_{protein_name}_btn"):
-                run_prediction_for_sequence(protein_info["sequence"])
+                st.session_state.sequence = protein_info["sequence"]
+                st.session_state.prediction_made = True
 
 else:
     # Prediction page: run prediction and show results
@@ -354,10 +373,6 @@ else:
     color_scheme = st.session_state.color_scheme
     spin = st.session_state.spin
     
-    # Also handle sidebar predict button click
-    if predict_clicked:
-        st.session_state.prediction_made = True
-
     with st.spinner('Predicting protein structure...'):
         pdb_string = fetch_prediction(sequence)
         
@@ -403,7 +418,7 @@ else:
                     "residue": list(range(1, len(st.session_state.plddts) + 1)), 
                     "pLDDT": st.session_state.plddts
                 })
-                st.line_chart(plddt_chart_data.set_index("residue"))
+                st.line_chart(plddt_chart_data.set_index("Amino Acid"))
 
             if sequence:
                 clean_seq = re.sub(r'[^A-Za-z]', '', sequence)
