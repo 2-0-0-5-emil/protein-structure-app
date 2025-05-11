@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Load Inter font and apply globally; refine sidebar styling and unify UI elements
+# Animated blue gradient background added here!
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
@@ -23,9 +23,16 @@ body, .stApp, [data-testid="stSidebar"] {
     font-family: 'Inter', sans-serif !important;
 }
 
-/* Main app background */
+/* Animated blue gradient background for the whole app */
 .stApp {
-    background-color: #f8fafc;
+    background: linear-gradient(-45deg, #2563eb, #1e40af, #60a5fa, #2563eb);
+    background-size: 400% 400%;
+    animation: gradientBG 12s ease infinite;
+}
+@keyframes gradientBG {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
 }
 
 /* Sidebar styling */
