@@ -31,7 +31,7 @@ body, .stApp, [data-testid="stSidebar"] {
 /* Sidebar styling */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #2563eb 0%, #1e40af 100%) !important;
-    padding: 1.5rem !important;
+    padding: 1.1rem 1.1rem 1.1rem 1.1rem !important;
     color: #f0f0f0 !important;  /* Light text for contrast */
     min-width: 340px !important;
     max-width: 340px !important;
@@ -70,8 +70,8 @@ body, .stApp, [data-testid="stSidebar"] {
     border: none !important;
     cursor: pointer;
     width: 100%;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
 }
 [data-testid="stSidebar"] div.stButton > button:hover {
     background-color: #1e40af !important;
@@ -109,12 +109,13 @@ body, .stApp, [data-testid="stSidebar"] {
 /* Text area styling */
 .stTextArea textarea {
     border-radius: 12px !important;
-    padding: 1rem !important;
+    padding: 0.65rem !important;
     border: 1px solid #e2e8f0 !important;
     font-family: 'Inter', sans-serif !important;
-    min-height: 140px !important;
-    max-height: 180px !important;
+    min-height: 110px !important;
+    max-height: 140px !important;
     font-size: 1.05rem !important;
+    margin-bottom: 0.3rem !important;
 }
 
 /* Custom header */
@@ -142,20 +143,21 @@ body, .stApp, [data-testid="stSidebar"] {
 h1, h2, h3 {
     font-weight: 700 !important;
     line-height: 1.3 !important;
-    margin-bottom: 0.5rem !important;
+    margin-bottom: 0.4rem !important;
 }
 
 p, label {
     font-weight: 500 !important;
     line-height: 1.5 !important;
-    margin-bottom: 0.75rem !important;
+    margin-bottom: 0.45rem !important;
     font-size: 1rem !important;
 }
 
-/* Consistent vertical spacing in sidebar */
+/* Consistent and tight vertical spacing in sidebar */
 [data-testid="stSidebar"] > div > div > div {
-    margin-bottom: 1.05rem !important;
+    margin-bottom: 0.7rem !important;
 }
+hr {margin: 0.7rem 0;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -186,9 +188,8 @@ def fetch_prediction(sequence):
 
 # ====== SIDEBAR CONTROLS ======
 with st.sidebar:
-    # Sidebar header without emoji
     st.markdown("""
-    <div style="text-align: center; margin-bottom: 1.2rem;">
+    <div style="text-align: center; margin-bottom: 0.7rem;">
         <h2 style="color: white; margin: 0;">Protein Input</h2>
     </div>
     """, unsafe_allow_html=True)
@@ -217,16 +218,12 @@ with st.sidebar:
     sequence = st.text_area(
         "Enter Protein Sequence", 
         sequence_input, 
-        height=150,
+        height=110,
         key="seq_input"
     )
 
-    # Place Predict button directly after sequence input for visibility
-    predict = st.button("Predict Structure", key="predict", type="primary")
-
-    # Visualization options grouped below
-    st.markdown("---")
-    st.markdown('<h3 style="color:white;margin-bottom:0.5rem;">Visualization Options</h3>', unsafe_allow_html=True)
+    st.markdown("---", unsafe_allow_html=True)
+    st.markdown('<h3 style="color:white;margin-bottom:0.4rem;">Visualization Options</h3>', unsafe_allow_html=True)
     
     color_scheme = st.selectbox(
         "Color Scheme", 
@@ -235,6 +232,9 @@ with st.sidebar:
     )
     
     spin = st.checkbox("Spin Structure", value=True, key="spin")
+
+    # Now both action buttons are together at the bottom
+    predict = st.button("Predict Structure", key="predict", type="primary")
     reset = st.button("Reset", key="reset")
 
     if reset:
