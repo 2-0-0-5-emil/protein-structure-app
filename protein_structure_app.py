@@ -10,7 +10,7 @@ import pandas as pd
 for key, default_value in {
     "prediction_made": False,
     "sequence": "",
-    "color_scheme": "chain",  # Changed default to 'chain' for better visibility
+    "color_scheme": "chain",
     "spin": True,
     "plddts": []
 }.items():
@@ -28,17 +28,8 @@ st.set_page_config(
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
-
-body, .stApp, [data-testid="stSidebar"] {
-    font-family: 'Inter', sans-serif !important;
-}
-
-/* Main app background */
-.stApp {
-    background-color: #f8fafc;
-}
-
-/* Sidebar styling */
+body, .stApp, [data-testid="stSidebar"] { font-family: 'Inter', sans-serif !important; }
+.stApp { background-color: #f8fafc; }
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #2563eb 0%, #1e40af 100%) !important;
     padding: 1.1rem 1.1rem 1.1rem 1.1rem !important;
@@ -47,8 +38,6 @@ body, .stApp, [data-testid="stSidebar"] {
     max-width: 340px !important;
     position: relative;
 }
-
-/* Sidebar top bar white area to align with Streamlit top taskbar */
 [data-testid="stSidebar"]::before {
     content: "";
     position: absolute;
@@ -59,13 +48,7 @@ body, .stApp, [data-testid="stSidebar"] {
     background-color: white !important;
     z-index: 1000;
 }
-
-/* Adjust sidebar content to not overlap the white top bar */
-[data-testid="stSidebar"] > div:first-child {
-    margin-top: 48px !important;
-}
-
-/* Sidebar widget labels and inputs */
+[data-testid="stSidebar"] > div:first-child { margin-top: 48px !important; }
 [data-testid="stSidebar"] label, 
 [data-testid="stSidebar"] .stTextArea textarea, 
 [data-testid="stSidebar"] .stTextInput input, 
@@ -74,8 +57,6 @@ body, .stApp, [data-testid="stSidebar"] {
     color: #f0f0f0 !important;
     font-weight: 500;
 }
-
-/* Sidebar input fields background and border */
 [data-testid="stSidebar"] .stTextArea textarea, 
 [data-testid="stSidebar"] .stTextInput input, 
 [data-testid="stSidebar"] select {
@@ -86,8 +67,6 @@ body, .stApp, [data-testid="stSidebar"] {
     padding: 0.5rem;
     font-size: 1rem;
 }
-
-/* Sidebar buttons */
 [data-testid="stSidebar"] div.stButton > button {
     background-color: #2563eb !important;
     color: white !important;
@@ -101,15 +80,8 @@ body, .stApp, [data-testid="stSidebar"] {
     margin-top: 0.25rem;
     margin-bottom: 0.25rem;
 }
-[data-testid="stSidebar"] div.stButton > button:hover {
-    background-color: #1e40af !important;
-}
-
-/* Tabs styling */
-.stTabs [role="tablist"] {
-    gap: 8px;
-}
-
+[data-testid="stSidebar"] div.stButton > button:hover { background-color: #1e40af !important; }
+.stTabs [role="tablist"] { gap: 8px; }
 .stTabs [role="tab"] {
     border-radius: 8px 8px 0 0 !important;
     padding: 0.5rem 1rem !important;
@@ -118,13 +90,7 @@ body, .stApp, [data-testid="stSidebar"] {
     font-weight: 600;
     font-family: 'Inter', sans-serif !important;
 }
-
-.stTabs [role="tab"][aria-selected="true"] {
-    background: #2563eb !important;
-    color: white !important;
-}
-
-/* Metric cards */
+.stTabs [role="tab"][aria-selected="true"] { background: #2563eb !important; color: white !important; }
 [data-testid="stMetric"] {
     background: white;
     border-radius: 12px;
@@ -133,8 +99,6 @@ body, .stApp, [data-testid="stSidebar"] {
     border: 1px solid #e2e8f0;
     font-family: 'Inter', sans-serif !important;
 }
-
-/* Text area styling */
 .stTextArea textarea {
     border-radius: 12px !important;
     padding: 0.65rem !important;
@@ -145,8 +109,6 @@ body, .stApp, [data-testid="stSidebar"] {
     font-size: 1.05rem !important;
     margin-bottom: 0.3rem !important;
 }
-
-/* Custom header */
 .custom-header {
     background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
     padding: 1.2rem 1.5rem 1.2rem 1.5rem;
@@ -156,39 +118,19 @@ body, .stApp, [data-testid="stSidebar"] {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     font-family: 'Inter', sans-serif !important;
 }
-
-/* Footer styling - improved visibility and compactness */
 .custom-footer {
     text-align: center;
     padding: 0.8rem 1rem;
     margin-top: 2rem;
-    color: #334155;  /* Dark slate color for good contrast */
+    color: #334155;
     font-size: 0.85rem;
     font-family: 'Inter', sans-serif !important;
     line-height: 1.3;
 }
-
-/* Typography improvements */
-h1, h2, h3 {
-    font-weight: 700 !important;
-    line-height: 1.3 !important;
-    margin-bottom: 0.4rem !important;
-}
-
-p, label {
-    font-weight: 500 !important;
-    line-height: 1.5 !important;
-    margin-bottom: 0.45rem !important;
-    font-size: 1rem !important;
-}
-
-/* Consistent and tight vertical spacing in sidebar */
-[data-testid="stSidebar"] > div > div > div {
-    margin-bottom: 0.7rem !important;
-}
+h1, h2, h3 { font-weight: 700 !important; line-height: 1.3 !important; margin-bottom: 0.4rem !important; }
+p, label { font-weight: 500 !important; line-height: 1.5 !important; margin-bottom: 0.45rem !important; font-size: 1rem !important; }
+[data-testid="stSidebar"] > div > div > div { margin-bottom: 0.7rem !important; }
 hr {margin: 0.7rem 0;}
-
-/* Protein template card styling */
 .protein-card {
     background: #fff;
     border-radius: 14px;
@@ -199,9 +141,7 @@ hr {margin: 0.7rem 0;}
     border: 1.5px solid #e2e8f0;
     transition: box-shadow 0.2s;
 }
-.protein-card:hover {
-    box-shadow: 0 8px 32px rgba(30,64,175,0.18);
-}
+.protein-card:hover { box-shadow: 0 8px 32px rgba(30,64,175,0.18); }
 .protein-card img {
     border-radius: 10px;
     margin-bottom: 0.5rem;
@@ -228,11 +168,7 @@ hr {margin: 0.7rem 0;}
     cursor: pointer;
     transition: background 0.2s;
 }
-.protein-card .protein-btn:hover {
-    background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
-}
-
-/* Video background on main page only */
+.protein-card .protein-btn:hover { background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%); }
 .video-bg {
     position: fixed;
     top: 0;
@@ -246,10 +182,7 @@ hr {margin: 0.7rem 0;}
     opacity: 0.20;
     pointer-events: none;
 }
-.main-content {
-    position: relative;
-    z-index: 1;
-}
+.main-content { position: relative; z-index: 1; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -342,7 +275,11 @@ def run_prediction_for_sequence(seq):
 def render_mol(pdb, color_scheme='chain', spin=True):
     pdbview = py3Dmol.view()
     pdbview.addModel(pdb, 'pdb')
-    pdbview.setStyle({'cartoon': {'color': color_scheme}})
+    # Custom: if spectrum, use blueCarbon for visibility
+    if color_scheme == "spectrum":
+        pdbview.setStyle({'cartoon': {'color': 'blueCarbon'}})
+    else:
+        pdbview.setStyle({'cartoon': {'color': color_scheme}})
     pdbview.setBackgroundColor('white')
     pdbview.zoomTo()
     pdbview.spin(spin)
@@ -399,6 +336,17 @@ if not st.session_state.prediction_made:
             
             if st.button(f"Predict this protein", key=f"predict_{protein_name}_btn"):
                 run_prediction_for_sequence(protein_info["sequence"])
+
+    # Footer is now inside main-content for always visible and compact
+    st.markdown("""
+    <div class="custom-footer" style="color:#1e293b; font-size:0.95rem; margin-top:1.2rem; padding:0.6rem 0 0.2rem 0;">
+        <hr style="border: 0.5px solid #e2e8f0; margin: 0.5rem 0 0.5rem 0;">
+        <div>Protein Structure Predictor v1.0 | Powered by ESMFold API</div>
+        <div style="font-size: 0.8rem; margin-top: 0.22rem;">
+            For research use only | Not for clinical or diagnostic use
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -478,6 +426,7 @@ else:
             st.code(pdb_string, language='pdb')
 
 # ====== FOOTER ======
+# (This is retained for the prediction page)
 st.markdown("""
 <div class="custom-footer">
     <hr style="border: 0.5px solid #e2e8f0; margin: 1rem 0 0 0;">
