@@ -5,4 +5,4 @@ biotite
 ipywidgets
 ipython_genutils
 matplotlib
-experimental_rerun
+
