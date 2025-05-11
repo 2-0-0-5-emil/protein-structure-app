@@ -356,7 +356,7 @@ if not st.session_state.prediction_made:
             """, unsafe_allow_html=True)
             
             # Display image from your GitHub raw URLs
-            st.image(protein_info['image_url'], use_column_width=True)
+            st.image(protein_info['image_url'], use_container_width=True)
             
             # Predict button below the image
             if st.button(f"Predict this protein", key=f"predict_{protein_name}_btn"):
