@@ -222,8 +222,8 @@ protein_templates = {
 }
 
 # ====== STATE MANAGEMENT ======
-if "predict" not in st.session_state:
-    st.session_state.predict = False
+if "prediction_made" not in st.session_state:
+    st.session_state.prediction_made = False
 if "sequence" not in st.session_state:
     st.session_state.sequence = ""
 if "color_scheme" not in st.session_state:
@@ -280,7 +280,7 @@ with st.sidebar:
     
     spin = st.checkbox("Spin Structure", value=True, key="spin")
 
-    predict = st.button("Predict Structure", key="predict", type="primary")
+    predict_clicked = st.button("Predict Structure", key="predict_button", type="primary")
     reset = st.button("Reset", key="reset")
 
     if reset:
@@ -291,10 +291,35 @@ with st.sidebar:
 # ====== FUNCTION TO RUN PREDICTION AND SET STATE ======
 def run_prediction_for_sequence(seq):
     st.session_state.sequence = seq
-    st.session_state.predict = True
+    st.session_state.prediction_made = True
+
+# ====== HELPER FUNCTIONS ======
+def render_mol(pdb, color_scheme='spectrum', spin=True):
+    pdbview = py3Dmol.view()
+    pdbview.addModel(pdb, 'pdb')
+    pdbview.setStyle({'cartoon': {'color': color_scheme}})
+    pdbview.setBackgroundColor('white')
+    pdbview.zoomTo()
+    pdbview.spin(spin)
+    showmol(pdbview, height=500, width=800)
+
+def get_confidence(plddt):
+    if plddt >= 90:
+        return "Very High"
+    elif plddt >= 70:
+        return "Confident"
+    elif plddt >= 50:
+        return "Low"
+    else:
+        return "Very Low"
+
+def fetch_prediction(sequence):
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    response = requests.post('https://api.esmatlas.com/foldSequence/v1/pdb/', headers=headers, data=sequence)
+    return response.content.decode('utf-8')
 
 # ====== MAIN CONTENT AREA ======
-if not st.session_state.predict:
+if not st.session_state.prediction_made:
     # Show header and template cards on main page before prediction
     st.markdown("""
     <div class="custom-header">
@@ -316,20 +341,22 @@ if not st.session_state.predict:
             <div class="protein-card">
                 <div class="protein-title">{protein_name}</div>
                 <img src="{protein_info['image_url']}" alt="{protein_name}" width="100%" />
-                <form action="" method="post">
-                    <button class="protein-btn" type="submit" name="predict_{idx}">Predict this protein</button>
-                </form>
             </div>
             """, unsafe_allow_html=True)
-            # Use a hidden Streamlit button to catch clicks
+            # Button below the card
             if st.button(f"Predict this protein", key=f"predict_{protein_name}_btn"):
                 run_prediction_for_sequence(protein_info["sequence"])
+
 else:
     # Prediction page: run prediction and show results
     sequence = st.session_state.sequence
     color_scheme = st.session_state.color_scheme
     spin = st.session_state.spin
     
+    # Also handle sidebar predict button click
+    if 'predict_button' in st.session_state and st.session_state.predict_button:
+        st.session_state.prediction_made = True
+
     with st.spinner('Predicting protein structure...'):
         pdb_string = fetch_prediction(sequence)
         
