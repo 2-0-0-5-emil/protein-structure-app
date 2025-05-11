@@ -137,4 +137,4 @@ if predict and sequence:
         st.text_area("PDB Data", pdb_string, height=300)
 
 elif not predict:
-    st.info()
+    st.info("")
