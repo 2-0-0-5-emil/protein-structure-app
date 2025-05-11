@@ -6,6 +6,19 @@ import biotite.structure.io as bsio
 import re
 import pandas as pd
 
+# ====== SESSION STATE INITIALIZATION ======
+# Initialize all session state variables at the very start to avoid AttributeErrors
+if "prediction_made" not in st.session_state:
+    st.session_state.prediction_made = False
+if "sequence" not in st.session_state:
+    st.session_state.sequence = ""
+if "color_scheme" not in st.session_state:
+    st.session_state.color_scheme = "spectrum"
+if "spin" not in st.session_state:
+    st.session_state.spin = True
+if "plddts" not in st.session_state:
+    st.session_state.plddts = []
+
 # ====== CUSTOM CSS & PAGE CONFIG ======
 st.set_page_config(
     layout='wide',
@@ -14,7 +27,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Load Inter font and apply globally; refine sidebar styling and unify UI elements
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
@@ -221,18 +233,6 @@ protein_templates = {
     }
 }
 
-# ====== STATE MANAGEMENT ======
-if "prediction_made" not in st.session_state:
-    st.session_state.prediction_made = False
-if "sequence" not in st.session_state:
-    st.session_state.sequence = ""
-if "color_scheme" not in st.session_state:
-    st.session_state.color_scheme = "spectrum"
-if "spin" not in st.session_state:
-    st.session_state.spin = True
-if "plddts" not in st.session_state:
-    st.session_state.plddts = []
-
 # ====== SIDEBAR CONTROLS ======
 with st.sidebar:
     st.markdown("""
@@ -283,12 +283,11 @@ with st.sidebar:
     predict_clicked = st.button("Predict Structure", key="predict_button", type="primary")
     reset = st.button("Reset", key="reset")
 
-    # FIXED RESET BUTTON HANDLER: Clear session state keys without using deprecated rerun
+    # Reset button clears all session state keys (without deprecated rerun)
     if reset:
         keys_to_clear = list(st.session_state.keys())
         for key in keys_to_clear:
             del st.session_state[key]
-        # No st.experimental_rerun() call here; Streamlit will rerun automatically due to state change
 
 # ====== FUNCTION TO RUN PREDICTION AND SET STATE ======
 def run_prediction_for_sequence(seq):
