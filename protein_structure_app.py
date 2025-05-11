@@ -49,18 +49,15 @@ body, .stApp, [data-testid="stSidebar"] {
 }
 
 /* Sidebar top bar white area to align with Streamlit top taskbar */
-/* Removed border-radius for square corners */
 [data-testid="stSidebar"]::before {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 48px; /* Approximate height of Streamlit top bar */
+    height: 48px;
     background-color: white !important;
     z-index: 1000;
-    /* border-bottom-left-radius: 8px;  Removed for square corners */
-    /* border-bottom-right-radius: 8px; Removed for square corners */
 }
 
 /* Adjust sidebar content to not overlap the white top bar */
@@ -150,7 +147,6 @@ body, .stApp, [data-testid="stSidebar"] {
 }
 
 /* Custom header */
-/* Reduced padding and margin for compactness */
 .custom-header {
     background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
     padding: 1.2rem 1.5rem 1.2rem 1.5rem;
@@ -192,7 +188,6 @@ p, label {
 hr {margin: 0.7rem 0;}
 
 /* Protein template card styling */
-/* Reduced padding and margin for compactness */
 .protein-card {
     background: #fff;
     border-radius: 14px;
@@ -211,7 +206,7 @@ hr {margin: 0.7rem 0;}
     margin-bottom: 0.5rem;
     border: 1px solid #e5e7eb;
     background: #f3f4f6;
-    max-height: 90px; /* smaller image height for compactness */
+    max-height: 90px;
     object-fit: contain;
 }
 .protein-card .protein-title {
@@ -234,21 +229,6 @@ hr {margin: 0.7rem 0;}
 }
 .protein-card .protein-btn:hover {
     background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
-}
-
-/* Video background on main page only */
-.video-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    min-width: 100vw;
-    min-height: 100vh;
-    width: auto;
-    height: auto;
-    z-index: -1;
-    object-fit: cover;
-    opacity: 0.20; /* adjust opacity as needed */
-    pointer-events: none;
 }
 .main-content {
     position: relative;
@@ -369,11 +349,27 @@ def fetch_prediction(sequence):
 
 # ====== MAIN CONTENT AREA ======
 if not st.session_state.prediction_made:
-    # Video background for main page only
-    st.markdown(f"""
-    <video class="video-bg" autoplay loop muted playsinline>
-      <source src="https://raw.githubusercontent.com/2-0-0-5-emil/protein-structure-app/main/wall%20(1).mp4" type="video/mp4">
-    </video>
+    # Live animated gradient background for main page only
+    st.markdown("""
+    <style>
+    .main-gradient-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -2;
+        background: linear-gradient(-45deg, #2563eb, #1e40af, #22d3ee, #f472b6);
+        background-size: 400% 400%;
+        animation: gradientBG 18s ease infinite;
+    }
+    @keyframes gradientBG {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
+    </style>
+    <div class="main-gradient-bg"></div>
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="main-content">', unsafe_allow_html=True)
