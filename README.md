@@ -1,5 +1,5 @@
 🔬 Protein Structure Prediction App
-Live Demo: Try it on Streamlit! 🚀
+Live Demo: [Try it on Streamlit!](https://protein-structure-app-m8klsbaxfbwauwaqm9syrb.streamlit.app/) 🚀
 ![Screenshot 2025-05-11 210306](https://github.com/user-attachments/assets/34dc9e63-a883-4b1b-a4e5-1b1cc7179826)
 
 📌 About the Project
