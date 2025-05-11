@@ -14,159 +14,310 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Animated blue gradient background added here!
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+# Determine if prediction was made
+prediction_made = "predict" in st.session_state and st.session_state.predict
 
-body, .stApp, [data-testid="stSidebar"] {
-    font-family: 'Inter', sans-serif !important;
-}
+# Animated soft purple-pink gradient background only on main page (no prediction)
+if not prediction_made:
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
-/* Animated blue gradient background for the whole app */
-.stApp {
-    background: linear-gradient(-45deg, #2563eb, #1e40af, #60a5fa, #2563eb);
-    background-size: 400% 400%;
-    animation: gradientBG 12s ease infinite;
-}
-@keyframes gradientBG {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
-}
+    body, .stApp, [data-testid="stSidebar"] {
+        font-family: 'Inter', sans-serif !important;
+    }
 
-/* Sidebar styling */
-[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #2563eb 0%, #1e40af 100%) !important;
-    padding: 1.1rem 1.1rem 1.1rem 1.1rem !important;
-    color: #f0f0f0 !important;  /* Light text for contrast */
-    min-width: 340px !important;
-    max-width: 340px !important;
-}
+    /* Animated soft purple-pink gradient background for main page only */
+    .stApp {
+        background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #fad0c4, #a18cd1);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+    }
+    @keyframes gradientBG {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
 
-/* Sidebar widget labels and inputs */
-[data-testid="stSidebar"] label, 
-[data-testid="stSidebar"] .stTextArea textarea, 
-[data-testid="stSidebar"] .stTextInput input, 
-[data-testid="stSidebar"] select,
-[data-testid="stSidebar"] .stCheckbox label {
-    color: #f0f0f0 !important;
-    font-weight: 500;
-}
+    /* Sidebar styling */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #2563eb 0%, #1e40af 100%) !important;
+        padding: 1.1rem 1.1rem 1.1rem 1.1rem !important;
+        color: #f0f0f0 !important;
+        min-width: 340px !important;
+        max-width: 340px !important;
+    }
 
-/* Sidebar input fields background and border */
-[data-testid="stSidebar"] .stTextArea textarea, 
-[data-testid="stSidebar"] .stTextInput input, 
-[data-testid="stSidebar"] select {
-    background-color: #1e3a8a !important;
-    border: 1px solid #3b82f6 !important;
-    color: white !important;
-    border-radius: 8px;
-    padding: 0.5rem;
-    font-size: 1rem;
-}
+    /* Sidebar widget labels and inputs */
+    [data-testid="stSidebar"] label, 
+    [data-testid="stSidebar"] .stTextArea textarea, 
+    [data-testid="stSidebar"] .stTextInput input, 
+    [data-testid="stSidebar"] select,
+    [data-testid="stSidebar"] .stCheckbox label {
+        color: #f0f0f0 !important;
+        font-weight: 500;
+    }
 
-/* Sidebar buttons */
-[data-testid="stSidebar"] div.stButton > button {
-    background-color: #2563eb !important;
-    color: white !important;
-    border-radius: 8px !important;
-    padding: 0.5rem 1rem !important;
-    font-weight: 600 !important;
-    transition: background-color 0.3s ease;
-    border: none !important;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 0.25rem;
-    margin-bottom: 0.25rem;
-}
-[data-testid="stSidebar"] div.stButton > button:hover {
-    background-color: #1e40af !important;
-}
+    /* Sidebar input fields background and border */
+    [data-testid="stSidebar"] .stTextArea textarea, 
+    [data-testid="stSidebar"] .stTextInput input, 
+    [data-testid="stSidebar"] select {
+        background-color: #1e3a8a !important;
+        border: 1px solid #3b82f6 !important;
+        color: white !important;
+        border-radius: 8px;
+        padding: 0.5rem;
+        font-size: 1rem;
+    }
 
-/* Tabs styling */
-.stTabs [role="tablist"] {
-    gap: 8px;
-}
+    /* Sidebar buttons */
+    [data-testid="stSidebar"] div.stButton > button {
+        background-color: #2563eb !important;
+        color: white !important;
+        border-radius: 8px !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: 600 !important;
+        transition: background-color 0.3s ease;
+        border: none !important;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+    [data-testid="stSidebar"] div.stButton > button:hover {
+        background-color: #1e40af !important;
+    }
 
-.stTabs [role="tab"] {
-    border-radius: 8px 8px 0 0 !important;
-    padding: 0.5rem 1rem !important;
-    background: #e2e8f0 !important;
-    transition: all 0.3s;
-    font-weight: 600;
-    font-family: 'Inter', sans-serif !important;
-}
+    /* Tabs styling */
+    .stTabs [role="tablist"] {
+        gap: 8px;
+    }
 
-.stTabs [role="tab"][aria-selected="true"] {
-    background: #2563eb !important;
-    color: white !important;
-}
+    .stTabs [role="tab"] {
+        border-radius: 8px 8px 0 0 !important;
+        padding: 0.5rem 1rem !important;
+        background: #e2e8f0 !important;
+        transition: all 0.3s;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif !important;
+    }
 
-/* Metric cards */
-[data-testid="stMetric"] {
-    background: white;
-    border-radius: 12px;
-    padding: 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    border: 1px solid #e2e8f0;
-    font-family: 'Inter', sans-serif !important;
-}
+    .stTabs [role="tab"][aria-selected="true"] {
+        background: #2563eb !important;
+        color: white !important;
+    }
 
-/* Text area styling */
-.stTextArea textarea {
-    border-radius: 12px !important;
-    padding: 0.65rem !important;
-    border: 1px solid #e2e8f0 !important;
-    font-family: 'Inter', sans-serif !important;
-    min-height: 110px !important;
-    max-height: 140px !important;
-    font-size: 1.05rem !important;
-    margin-bottom: 0.3rem !important;
-}
+    /* Metric cards */
+    [data-testid="stMetric"] {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        font-family: 'Inter', sans-serif !important;
+    }
 
-/* Custom header */
-.custom-header {
-    background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
-    padding: 2rem;
-    border-radius: 12px;
-    color: white;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    font-family: 'Inter', sans-serif !important;
-}
+    /* Text area styling */
+    .stTextArea textarea {
+        border-radius: 12px !important;
+        padding: 0.65rem !important;
+        border: 1px solid #e2e8f0 !important;
+        font-family: 'Inter', sans-serif !important;
+        min-height: 110px !important;
+        max-height: 140px !important;
+        font-size: 1.05rem !important;
+        margin-bottom: 0.3rem !important;
+    }
 
-/* Footer styling */
-.custom-footer {
-    text-align: center;
-    padding: 1.5rem;
-    margin-top: 3rem;
-    color: #64748b;
-    font-size: 0.9rem;
-    font-family: 'Inter', sans-serif !important;
-}
+    /* Custom header */
+    .custom-header {
+        background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        color: white;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        font-family: 'Inter', sans-serif !important;
+    }
 
-/* Typography improvements */
-h1, h2, h3 {
-    font-weight: 700 !important;
-    line-height: 1.3 !important;
-    margin-bottom: 0.4rem !important;
-}
+    /* Footer styling */
+    .custom-footer {
+        text-align: center;
+        padding: 1.5rem;
+        margin-top: 3rem;
+        color: #64748b;
+        font-size: 0.9rem;
+        font-family: 'Inter', sans-serif !important;
+    }
 
-p, label {
-    font-weight: 500 !important;
-    line-height: 1.5 !important;
-    margin-bottom: 0.45rem !important;
-    font-size: 1rem !important;
-}
+    /* Typography improvements */
+    h1, h2, h3 {
+        font-weight: 700 !important;
+        line-height: 1.3 !important;
+        margin-bottom: 0.4rem !important;
+    }
 
-/* Consistent and tight vertical spacing in sidebar */
-[data-testid="stSidebar"] > div > div > div {
-    margin-bottom: 0.7rem !important;
-}
-hr {margin: 0.7rem 0;}
-</style>
-""", unsafe_allow_html=True)
+    p, label {
+        font-weight: 500 !important;
+        line-height: 1.5 !important;
+        margin-bottom: 0.45rem !important;
+        font-size: 1rem !important;
+    }
+
+    /* Consistent and tight vertical spacing in sidebar */
+    [data-testid="stSidebar"] > div > div > div {
+        margin-bottom: 0.7rem !important;
+    }
+    hr {margin: 0.7rem 0;}
+    </style>
+    """, unsafe_allow_html=True)
+
+else:
+    # Prediction page: clean white background, same styling except no animated background
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+    body, .stApp, [data-testid="stSidebar"] {
+        font-family: 'Inter', sans-serif !important;
+    }
+
+    .stApp {
+        background-color: white !important;
+    }
+
+    /* Sidebar styling */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #2563eb 0%, #1e40af 100%) !important;
+        padding: 1.1rem 1.1rem 1.1rem 1.1rem !important;
+        color: #f0f0f0 !important;
+        min-width: 340px !important;
+        max-width: 340px !important;
+    }
+
+    /* Sidebar widget labels and inputs */
+    [data-testid="stSidebar"] label, 
+    [data-testid="stSidebar"] .stTextArea textarea, 
+    [data-testid="stSidebar"] .stTextInput input, 
+    [data-testid="stSidebar"] select,
+    [data-testid="stSidebar"] .stCheckbox label {
+        color: #f0f0f0 !important;
+        font-weight: 500;
+    }
+
+    /* Sidebar input fields background and border */
+    [data-testid="stSidebar"] .stTextArea textarea, 
+    [data-testid="stSidebar"] .stTextInput input, 
+    [data-testid="stSidebar"] select {
+        background-color: #1e3a8a !important;
+        border: 1px solid #3b82f6 !important;
+        color: white !important;
+        border-radius: 8px;
+        padding: 0.5rem;
+        font-size: 1rem;
+    }
+
+    /* Sidebar buttons */
+    [data-testid="stSidebar"] div.stButton > button {
+        background-color: #2563eb !important;
+        color: white !important;
+        border-radius: 8px !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: 600 !important;
+        transition: background-color 0.3s ease;
+        border: none !important;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+    [data-testid="stSidebar"] div.stButton > button:hover {
+        background-color: #1e40af !important;
+    }
+
+    /* Tabs styling */
+    .stTabs [role="tablist"] {
+        gap: 8px;
+    }
+
+    .stTabs [role="tab"] {
+        border-radius: 8px 8px 0 0 !important;
+        padding: 0.5rem 1rem !important;
+        background: #e2e8f0 !important;
+        transition: all 0.3s;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif !important;
+    }
+
+    .stTabs [role="tab"][aria-selected="true"] {
+        background: #2563eb !important;
+        color: white !important;
+    }
+
+    /* Metric cards */
+    [data-testid="stMetric"] {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        font-family: 'Inter', sans-serif !important;
+    }
+
+    /* Text area styling */
+    .stTextArea textarea {
+        border-radius: 12px !important;
+        padding: 0.65rem !important;
+        border: 1px solid #e2e8f0 !important;
+        font-family: 'Inter', sans-serif !important;
+        min-height: 110px !important;
+        max-height: 140px !important;
+        font-size: 1.05rem !important;
+        margin-bottom: 0.3rem !important;
+    }
+
+    /* Custom header */
+    .custom-header {
+        background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        color: white;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        font-family: 'Inter', sans-serif !important;
+    }
+
+    /* Footer styling */
+    .custom-footer {
+        text-align: center;
+        padding: 1.5rem;
+        margin-top: 3rem;
+        color: #64748b;
+        font-size: 0.9rem;
+        font-family: 'Inter', sans-serif !important;
+    }
+
+    /* Typography improvements */
+    h1, h2, h3 {
+        font-weight: 700 !important;
+        line-height: 1.3 !important;
+        margin-bottom: 0.4rem !important;
+    }
+
+    p, label {
+        font-weight: 500 !important;
+        line-height: 1.5 !important;
+        margin-bottom: 0.45rem !important;
+        font-size: 1rem !important;
+    }
+
+    /* Consistent and tight vertical spacing in sidebar */
+    [data-testid="stSidebar"] > div > div > div {
+        margin-bottom: 0.7rem !important;
+    }
+    hr {margin: 0.7rem 0;}
+    </style>
+    """, unsafe_allow_html=True)
 
 # ====== ORIGINAL FUNCTIONALITY (WITH VISUAL TWEAKS) ======
 def render_mol(pdb, color_scheme='spectrum', spin=True):
@@ -240,7 +391,6 @@ with st.sidebar:
     
     spin = st.checkbox("Spin Structure", value=True, key="spin")
 
-    # Now both action buttons are together at the bottom
     predict = st.button("Predict Structure", key="predict", type="primary")
     reset = st.button("Reset", key="reset")
 
@@ -263,8 +413,8 @@ if predict and sequence:
         confidence = get_confidence(plddt)
 
         st.session_state.plddts = struct.b_factor.tolist()
+        st.session_state.predict = True  # Mark prediction done
 
-        # Hide header/instructions, show only results
         tab1, tab2, tab3 = st.tabs(["3D Structure", "Sequence Analysis", "PDB Data"])
 
         with tab1:
