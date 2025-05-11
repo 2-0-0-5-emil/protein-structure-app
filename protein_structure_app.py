@@ -38,13 +38,13 @@ st.title('🔬 Protein Structure Predictor using ESMFold')
 st.markdown('---')
 
 # ✅ Hero Introduction Section
-st.markdown("""
-<div style='background-color: #f0f8ff; padding: 20px; border-radius: 10px; margin-bottom: 20px;'>
-    <h2 style='color: #333;'>Welcome to the Protein Structure Predictor</h2>
-    <p style='font-size: 16px; color: #555;'>
-        This tool uses cutting-edge AI (ESMFold) to predict the 3D structure of proteins directly from their amino acid sequences.
-        Simply paste your sequence or choose a sample from the sidebar to get started.
-    </p>
+st.markdown(""" 
+<div style='background-color: #f0f8ff; padding: 20px; border-radius: 10px; margin-bottom: 20px;'> 
+    <h2 style='color: #333;'>Welcome to the Protein Structure Predictor</h2> 
+    <p style='font-size: 16px; color: #555;'> 
+        This tool uses cutting-edge AI (ESMFold) to predict the 3D structure of proteins directly from their amino acid sequences. 
+        Simply paste your sequence or choose a sample from the sidebar to get started. 
+    </p> 
 </div>
 """, unsafe_allow_html=True)
 
@@ -68,6 +68,30 @@ else:
 
 sequence = st.sidebar.text_area("Enter Protein Sequence", sequence_input, height=250)
 
+# ✅ Example Proteins Gallery (Clickable Cards)
+st.sidebar.subheader("Example Proteins Gallery")
+
+def on_click_sequence(seq):
+    st.session_state.sequence = seq
+    st.experimental_rerun()
+
+example_proteins = [
+    ("T4 Lysozyme", example_sequences["T4 Lysozyme (small)"]),
+    ("Human Hemoglobin", example_sequences["Human Hemoglobin (complex)"]),
+    ("GFP", example_sequences["GFP (medium)"])
+]
+
+for name, seq in example_proteins:
+    st.sidebar.markdown(
+        f"""
+        <div style="background-color: #f0f8ff; padding: 15px; border-radius: 10px; cursor: pointer; text-align: center;"
+             onclick="window.parent.streamlit.setComponentValue({{ 'sequence': '{seq}' }})">
+            <h5 style="color: #333;">{name}</h5>
+        </div>
+        """, unsafe_allow_html=True
+    )
+    if st.sidebar.button(f"Select {name}"):
+        on_click_sequence(seq)
 
 st.sidebar.title("🔧 Visualization Options")
 color_scheme = st.sidebar.selectbox("Color Scheme", ["spectrum", "chain", "residue", "secondary structure"])
@@ -79,7 +103,6 @@ if reset:
     st.rerun()
 
 predict = st.sidebar.button("Predict Structure")
-
 
 if predict and sequence:
     pdb_string = fetch_prediction(sequence)
@@ -107,7 +130,6 @@ if predict and sequence:
     with tab2:
         st.subheader('Sequence Analysis')
 
-
         if st.session_state.plddts:
             st.write("### pLDDT per Residue")
             st.write("pLDDT (predicted Local Distance Difference Test) is a per-residue estimate of the confidence in prediction on a scale from 0-100.")
@@ -116,10 +138,8 @@ if predict and sequence:
             st.write("- 50-70: Medium confidence")
             st.write("- Below 50: Low confidence")
 
-
             plddt_chart_data = pd.DataFrame({"residue": list(range(1, len(st.session_state.plddts) + 1)), "pLDDT": st.session_state.plddts})
             st.line_chart(plddt_chart_data.set_index("residue"))
-
 
         if sequence:
             clean_seq = re.sub(r'[^A-Za-z]', '', sequence)
@@ -137,4 +157,4 @@ if predict and sequence:
         st.text_area("PDB Data", pdb_string, height=300)
 
 elif not predict:
-    st.info("")
+    st.info("👈 Paste a sequence and click Predict to begin.")
