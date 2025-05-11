@@ -7,7 +7,6 @@ import re
 import pandas as pd
 
 # ====== SESSION STATE INITIALIZATION ======
-# Initialize all session state variables at the very start to avoid AttributeErrors
 if "prediction_made" not in st.session_state:
     st.session_state.prediction_made = False
 if "sequence" not in st.session_state:
@@ -233,19 +232,6 @@ protein_templates = {
     }
 }
 
-# ====== SESSION STATE INITIALIZATION ======
-# Initialize all session state variables at the very start to avoid AttributeErrors
-if "prediction_made" not in st.session_state:
-    st.session_state.prediction_made = False
-if "sequence" not in st.session_state:
-    st.session_state.sequence = ""
-if "color_scheme" not in st.session_state:
-    st.session_state.color_scheme = "spectrum"
-if "spin" not in st.session_state:
-    st.session_state.spin = True
-if "plddts" not in st.session_state:
-    st.session_state.plddts = []
-
 # ====== SIDEBAR CONTROLS ======
 with st.sidebar:
     st.markdown("""
@@ -364,8 +350,7 @@ if not st.session_state.prediction_made:
             """, unsafe_allow_html=True)
             # If predict button in template is clicked:
             if st.button(f"Predict this protein", key=f"predict_{protein_name}_btn"):
-                st.session_state.sequence = protein_info["sequence"]
-                st.session_state.prediction_made = True
+                run_prediction_for_sequence(protein_info["sequence"])
 
 else:
     # Prediction page: run prediction and show results
@@ -414,11 +399,12 @@ else:
                 - Below 50: Low confidence
                 """)
 
+                # FIX: Set index to 'residue' (not 'Amino Acid') for pLDDT line chart
                 plddt_chart_data = pd.DataFrame({
                     "residue": list(range(1, len(st.session_state.plddts) + 1)), 
                     "pLDDT": st.session_state.plddts
                 })
-                st.line_chart(plddt_chart_data.set_index("Amino Acid"))
+                st.line_chart(plddt_chart_data.set_index("residue"))
 
             if sequence:
                 clean_seq = re.sub(r'[^A-Za-z]', '', sequence)
@@ -431,6 +417,7 @@ else:
                     "Amino Acid": list(aa_counts.keys()), 
                     "Count": list(aa_counts.values())
                 })
+                # Ensure correct column name 'Amino Acid' is used here
                 st.bar_chart(aa_data.set_index("Amino Acid"))
 
         with tab3:
