@@ -7,16 +7,16 @@ import re
 import pandas as pd
 
 # ====== SESSION STATE INITIALIZATION ======
-if "prediction_made" not in st.session_state:
-    st.session_state.prediction_made = False
-if "sequence" not in st.session_state:
-    st.session_state.sequence = ""
-if "color_scheme" not in st.session_state:
-    st.session_state.color_scheme = "spectrum"
-if "spin" not in st.session_state:
-    st.session_state.spin = True
-if "plddts" not in st.session_state:
-    st.session_state.plddts = []
+# Initialize all session state keys with defaults at the very start
+for key, default_value in {
+    "prediction_made": False,
+    "sequence": "",
+    "color_scheme": "spectrum",
+    "spin": True,
+    "plddts": []
+}.items():
+    if key not in st.session_state:
+        st.session_state[key] = default_value
 
 # ====== CUSTOM CSS & PAGE CONFIG ======
 st.set_page_config(
@@ -287,11 +287,18 @@ with st.sidebar:
         st.session_state.prediction_made = True
         st.session_state.sequence = st.session_state.seq_input
 
-    # Reset button clears all session state keys (without deprecated rerun)
+    # ====== RESET BUTTON HANDLER ======
+    # Clear all session state keys and then re-initialize critical keys to avoid AttributeError
     if reset:
         keys_to_clear = list(st.session_state.keys())
         for key in keys_to_clear:
             del st.session_state[key]
+        # Re-initialize critical keys immediately after clearing
+        st.session_state.prediction_made = False
+        st.session_state.sequence = ""
+        st.session_state.color_scheme = "spectrum"
+        st.session_state.spin = True
+        st.session_state.plddts = []
 
 # ====== FUNCTION TO RUN PREDICTION AND SET STATE ======
 def run_prediction_for_sequence(seq):
@@ -399,7 +406,6 @@ else:
                 - Below 50: Low confidence
                 """)
 
-                # FIX: Set index to 'residue' (not 'Amino Acid') for pLDDT line chart
                 plddt_chart_data = pd.DataFrame({
                     "residue": list(range(1, len(st.session_state.plddts) + 1)), 
                     "pLDDT": st.session_state.plddts
@@ -417,7 +423,6 @@ else:
                     "Amino Acid": list(aa_counts.keys()), 
                     "Count": list(aa_counts.values())
                 })
-                # Ensure correct column name 'Amino Acid' is used here
                 st.bar_chart(aa_data.set_index("Amino Acid"))
 
         with tab3:
