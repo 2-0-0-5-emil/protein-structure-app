@@ -1,3 +1,4 @@
+second last version 
 import streamlit as st
 from stmol import showmol
 import py3Dmol
@@ -7,7 +8,6 @@ import re
 import pandas as pd
 
 # ====== SESSION STATE INITIALIZATION ======
-# Initialize all session state keys with defaults at the very start
 for key, default_value in {
     "prediction_made": False,
     "sequence": "",
@@ -46,6 +46,24 @@ body, .stApp, [data-testid="stSidebar"] {
     color: #f0f0f0 !important;
     min-width: 340px !important;
     max-width: 340px !important;
+    position: relative;
+}
+
+/* Sidebar top bar white area to align with Streamlit top taskbar */
+[data-testid="stSidebar"]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 48px;
+    background-color: white !important;
+    z-index: 1000;
+}
+
+/* Adjust sidebar content to not overlap the white top bar */
+[data-testid="stSidebar"] > div:first-child {
+    margin-top: 48px !important;
 }
 
 /* Sidebar widget labels and inputs */
@@ -132,10 +150,10 @@ body, .stApp, [data-testid="stSidebar"] {
 /* Custom header */
 .custom-header {
     background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
-    padding: 2rem;
+    padding: 1.2rem 1.5rem 1.2rem 1.5rem;
     border-radius: 12px;
     color: white;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     font-family: 'Inter', sans-serif !important;
 }
@@ -175,8 +193,8 @@ hr {margin: 0.7rem 0;}
     background: #fff;
     border-radius: 14px;
     box-shadow: 0 2px 16px rgba(30,64,175,0.10);
-    padding: 1.2rem 1rem 1rem 1rem;
-    margin-bottom: 1.2rem;
+    padding: 0.8rem 0.8rem 0.8rem 0.8rem;
+    margin-bottom: 0.8rem;
     text-align: center;
     border: 1.5px solid #e2e8f0;
     transition: box-shadow 0.2s;
@@ -186,16 +204,16 @@ hr {margin: 0.7rem 0;}
 }
 .protein-card img {
     border-radius: 10px;
-    margin-bottom: 0.7rem;
+    margin-bottom: 0.5rem;
     border: 1px solid #e5e7eb;
     background: #f3f4f6;
-    max-height: 120px;
+    max-height: 90px;
     object-fit: contain;
 }
 .protein-card .protein-title {
     font-weight: 700;
-    font-size: 1.08rem;
-    margin-bottom: 0.7rem;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
     color: #1e40af;
 }
 .protein-card .protein-btn {
@@ -203,15 +221,19 @@ hr {margin: 0.7rem 0;}
     color: #fff;
     border: none;
     border-radius: 7px;
-    padding: 0.5rem 1.2rem;
+    padding: 0.4rem 1rem;
     font-weight: 600;
-    font-size: 1rem;
-    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    margin-top: 0.3rem;
     cursor: pointer;
     transition: background 0.2s;
 }
 .protein-card .protein-btn:hover {
     background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
+}
+.main-content {
+    position: relative;
+    z-index: 1;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -282,18 +304,14 @@ with st.sidebar:
     predict_clicked = st.button("Predict Structure", key="predict_button", type="primary")
     reset = st.button("Reset", key="reset")
 
-    # If predict button in sidebar is clicked:
     if predict_clicked:
         st.session_state.prediction_made = True
         st.session_state.sequence = st.session_state.seq_input
 
-    # ====== RESET BUTTON HANDLER ======
-    # Clear all session state keys and then re-initialize critical keys to avoid AttributeError
     if reset:
         keys_to_clear = list(st.session_state.keys())
         for key in keys_to_clear:
             del st.session_state[key]
-        # Re-initialize critical keys immediately after clearing
         st.session_state.prediction_made = False
         st.session_state.sequence = ""
         st.session_state.color_scheme = "spectrum"
@@ -332,7 +350,31 @@ def fetch_prediction(sequence):
 
 # ====== MAIN CONTENT AREA ======
 if not st.session_state.prediction_made:
-    # Show header and template cards on main page before prediction
+    # Live animated gradient background for main page only
+    st.markdown("""
+    <style>
+    .main-gradient-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -2;
+        background: linear-gradient(-45deg, #2563eb, #1e40af, #22d3ee, #f472b6);
+        background-size: 400% 400%;
+        animation: gradientBG 18s ease infinite;
+    }
+    @keyframes gradientBG {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
+    </style>
+    <div class="main-gradient-bg"></div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="main-content">', unsafe_allow_html=True)
+
     st.markdown("""
     <div class="custom-header">
         <h1 style="margin: 0;">Protein Structure Predictor</h1>
@@ -344,7 +386,6 @@ if not st.session_state.prediction_made:
 
     st.markdown("### Try a preset protein sequence:")
     
-    # Layout 3 columns for 3 protein templates
     colA, colB, colC = st.columns(3)
     cols = [colA, colB, colC]
     for idx, (protein_name, protein_info) in enumerate(protein_templates.items()):
@@ -355,15 +396,14 @@ if not st.session_state.prediction_made:
             </div>
             """, unsafe_allow_html=True)
             
-            # Display image from your GitHub raw URLs
             st.image(protein_info['image_url'], use_container_width=True)
             
-            # Predict button below the image
             if st.button(f"Predict this protein", key=f"predict_{protein_name}_btn"):
                 run_prediction_for_sequence(protein_info["sequence"])
 
+    st.markdown('</div>', unsafe_allow_html=True)
+
 else:
-    # Prediction page: run prediction and show results
     sequence = st.session_state.sequence
     color_scheme = st.session_state.color_scheme
     spin = st.session_state.spin
