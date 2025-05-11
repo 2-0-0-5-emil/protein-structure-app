@@ -32,7 +32,7 @@ body, .stApp, [data-testid="stSidebar"] {
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #2563eb 0%, #1e40af 100%) !important;
     padding: 1.1rem 1.1rem 1.1rem 1.1rem !important;
-    color: #f0f0f0 !important;  /* Light text for contrast */
+    color: #f0f0f0 !important;
     min-width: 340px !important;
     max-width: 340px !important;
 }
@@ -158,33 +158,80 @@ p, label {
     margin-bottom: 0.7rem !important;
 }
 hr {margin: 0.7rem 0;}
+
+/* Protein template card styling */
+.protein-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 16px rgba(30,64,175,0.10);
+    padding: 1.2rem 1rem 1rem 1rem;
+    margin-bottom: 1.2rem;
+    text-align: center;
+    border: 1.5px solid #e2e8f0;
+    transition: box-shadow 0.2s;
+}
+.protein-card:hover {
+    box-shadow: 0 8px 32px rgba(30,64,175,0.18);
+}
+.protein-card img {
+    border-radius: 10px;
+    margin-bottom: 0.7rem;
+    border: 1px solid #e5e7eb;
+    background: #f3f4f6;
+    max-height: 120px;
+    object-fit: contain;
+}
+.protein-card .protein-title {
+    font-weight: 700;
+    font-size: 1.08rem;
+    margin-bottom: 0.7rem;
+    color: #1e40af;
+}
+.protein-card .protein-btn {
+    background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 0.5rem 1.2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.protein-card .protein-btn:hover {
+    background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
+}
 </style>
 """, unsafe_allow_html=True)
 
-# ====== ORIGINAL FUNCTIONALITY (WITH VISUAL TWEAKS) ======
-def render_mol(pdb, color_scheme='spectrum', spin=True):
-    pdbview = py3Dmol.view()
-    pdbview.addModel(pdb, 'pdb')
-    pdbview.setStyle({'cartoon': {'color': color_scheme}})
-    pdbview.setBackgroundColor('white')
-    pdbview.zoomTo()
-    pdbview.spin(spin)
-    showmol(pdbview, height=500, width=800)
+# ====== PROTEIN TEMPLATE DATA ======
+protein_templates = {
+    "T4 Lysozyme (small)": {
+        "sequence": "MNIFEMLRIDEGLRLKIYKDTEGYYTIGIGHLLTKSPSLNAAKSELDKAIGRNTNGVITKDEAEKLFNQDVDAAVRGILRNAKLKPVYDSLDAVRRAALINMVFQMGETGVAGFTNSLRMLQQKRWDEAAVNLAKSRWYNQTPNRAKRVITTFRTGTWDAYKNL",
+        "image_url": "https://files.rcsb.org/view/2LZM_mol.png"
+    },
+    "GFP (medium)": {
+        "sequence": "MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTFSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK",
+        "image_url": "https://files.rcsb.org/view/1EMA_mol.png"
+    },
+    "Human Hemoglobin (complex)": {
+        "sequence": "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
+        "image_url": "https://files.rcsb.org/view/1A3N_mol.png"
+    }
+}
 
-def get_confidence(plddt):
-    if plddt >= 90:
-        return "Very High"
-    elif plddt >= 70:
-        return "Confident"
-    elif plddt >= 50:
-        return "Low"
-    else:
-        return "Very Low"
-
-def fetch_prediction(sequence):
-    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-    response = requests.post('https://api.esmatlas.com/foldSequence/v1/pdb/', headers=headers, data=sequence)
-    return response.content.decode('utf-8')
+# ====== STATE MANAGEMENT ======
+if "predict" not in st.session_state:
+    st.session_state.predict = False
+if "sequence" not in st.session_state:
+    st.session_state.sequence = ""
+if "color_scheme" not in st.session_state:
+    st.session_state.color_scheme = "spectrum"
+if "spin" not in st.session_state:
+    st.session_state.spin = True
+if "plddts" not in st.session_state:
+    st.session_state.plddts = []
 
 # ====== SIDEBAR CONTROLS ======
 with st.sidebar:
@@ -196,9 +243,9 @@ with st.sidebar:
     
     example_sequences = {
         "Current sequence": "",
-        "T4 Lysozyme (small)": "MNIFEMLRIDEGLRLKIYKDTEGYYTIGIGHLLTKSPSLNAAKSELDKAIGRNTNGVITKDEAEKLFNQDVDAAVRGILRNAKLKPVYDSLDAVRRAALINMVFQMGETGVAGFTNSLRMLQQKRWDEAAVNLAKSRWYNQTPNRAKRVITTFRTGTWDAYKNL",
-        "GFP (medium)": "MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTFSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK",
-        "Human Hemoglobin (complex)": "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR"
+        "T4 Lysozyme (small)": protein_templates["T4 Lysozyme (small)"]["sequence"],
+        "GFP (medium)": protein_templates["GFP (medium)"]["sequence"],
+        "Human Hemoglobin (complex)": protein_templates["Human Hemoglobin (complex)"]["sequence"]
     }
 
     selected_example = st.selectbox(
@@ -233,7 +280,6 @@ with st.sidebar:
     
     spin = st.checkbox("Spin Structure", value=True, key="spin")
 
-    # Now both action buttons are together at the bottom
     predict = st.button("Predict Structure", key="predict", type="primary")
     reset = st.button("Reset", key="reset")
 
@@ -242,8 +288,48 @@ with st.sidebar:
             del st.session_state[key]
         st.experimental_rerun()
 
+# ====== FUNCTION TO RUN PREDICTION AND SET STATE ======
+def run_prediction_for_sequence(seq):
+    st.session_state.sequence = seq
+    st.session_state.predict = True
+
 # ====== MAIN CONTENT AREA ======
-if predict and sequence:
+if not st.session_state.predict:
+    # Show header and template cards on main page before prediction
+    st.markdown("""
+    <div class="custom-header">
+        <h1 style="margin: 0;">Protein Structure Predictor</h1>
+        <p style="margin: 0.5rem 0 0; font-size: 1.1rem; opacity: 0.9;">
+            Predict 3D protein structures using ESMFold's cutting-edge AI
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("### Try a preset protein sequence:")
+    
+    # Layout 3 columns for 3 protein templates
+    colA, colB, colC = st.columns(3)
+    cols = [colA, colB, colC]
+    for idx, (protein_name, protein_info) in enumerate(protein_templates.items()):
+        with cols[idx]:
+            st.markdown(f"""
+            <div class="protein-card">
+                <div class="protein-title">{protein_name}</div>
+                <img src="{protein_info['image_url']}" alt="{protein_name}" width="100%" />
+                <form action="" method="post">
+                    <button class="protein-btn" type="submit" name="predict_{idx}">Predict this protein</button>
+                </form>
+            </div>
+            """, unsafe_allow_html=True)
+            # Use a hidden Streamlit button to catch clicks
+            if st.button(f"Predict this protein", key=f"predict_{protein_name}_btn"):
+                run_prediction_for_sequence(protein_info["sequence"])
+else:
+    # Prediction page: run prediction and show results
+    sequence = st.session_state.sequence
+    color_scheme = st.session_state.color_scheme
+    spin = st.session_state.spin
+    
     with st.spinner('Predicting protein structure...'):
         pdb_string = fetch_prediction(sequence)
         
@@ -257,7 +343,6 @@ if predict and sequence:
 
         st.session_state.plddts = struct.b_factor.tolist()
 
-        # Hide header/instructions, show only results
         tab1, tab2, tab3 = st.tabs(["3D Structure", "Sequence Analysis", "PDB Data"])
 
         with tab1:
@@ -314,18 +399,6 @@ if predict and sequence:
                 mime="text/plain"
             )
             st.code(pdb_string, language='pdb')
-
-else:
-    # Show header/instructions only if not predicting
-    st.markdown("""
-    <div class="custom-header">
-        <h1 style="margin: 0;">Protein Structure Predictor</h1>
-        <p style="margin: 0.5rem 0 0; font-size: 1.1rem; opacity: 0.9;">
-            Predict 3D protein structures using ESMFold's cutting-edge AI
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    st.info("Enter a protein sequence and click **Predict Structure** to begin")
 
 # ====== FOOTER ======
 st.markdown("""
