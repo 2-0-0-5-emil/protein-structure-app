@@ -146,15 +146,26 @@ body, .stApp, [data-testid="stSidebar"] {
     margin-bottom: 0.3rem !important;
 }
 
-/* Custom header */
+/* Custom header - lifted and joined with sidebar */
 .custom-header {
     background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
-    padding: 1.2rem 1.5rem 1.2rem 1.5rem;
-    border-radius: 12px;
+    margin-top: -3.5rem !important;   /* Lifts header up to touch the Streamlit taskbar */
+    padding-top: 1.1rem !important;
+    padding-bottom: 1.1rem !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+    border-radius: 0 0 12px 12px !important; /* No top rounding */
     color: white;
-    margin-bottom: 1rem;
+    margin-bottom: 0.7rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     font-family: 'Inter', sans-serif !important;
+    z-index: 10;
+    position: relative;
+}
+
+/* Remove default Streamlit main block top padding */
+.block-container {
+    padding-top: 0rem !important;
 }
 
 /* Footer styling */
@@ -349,29 +360,6 @@ def fetch_prediction(sequence):
 
 # ====== MAIN CONTENT AREA ======
 if not st.session_state.prediction_made:
-    # Live animated gradient background for main page only
-    st.markdown("""
-    <style>
-    .main-gradient-bg {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: -2;
-        background: linear-gradient(-45deg, #2563eb, #1e40af, #22d3ee, #f472b6);
-        background-size: 400% 400%;
-        animation: gradientBG 18s ease infinite;
-    }
-    @keyframes gradientBG {
-        0% {background-position: 0% 50%;}
-        50% {background-position: 100% 50%;}
-        100% {background-position: 0% 50%;}
-    }
-    </style>
-    <div class="main-gradient-bg"></div>
-    """, unsafe_allow_html=True)
-
     st.markdown('<div class="main-content">', unsafe_allow_html=True)
 
     st.markdown("""
