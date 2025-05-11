@@ -43,7 +43,7 @@ st.markdown("""
     <h2 style='color: #333;'>Welcome to the Protein Structure Predictor</h2> 
     <p style='font-size: 16px; color: #555;'> 
         This tool uses cutting-edge AI (ESMFold) to predict the 3D structure of proteins directly from their amino acid sequences. 
-        Simply paste your sequence or choose a sample from the sidebar to get started. 
+        Simply paste your sequence or choose a sample protein to get started. 
     </p> 
 </div>
 """, unsafe_allow_html=True)
@@ -57,7 +57,7 @@ example_sequences = {
     "Human Hemoglobin (complex)": "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR"
 }
 
-selected_example = st.sidebar.selectbox("Select an example protein", options=list(example_sequences.keys()))
+selected_example = st.selectbox("Select an example protein", options=list(example_sequences.keys()))
 sequence_input = example_sequences[selected_example]
 
 if selected_example == "Current sequence":
@@ -66,10 +66,10 @@ if selected_example == "Current sequence":
 else:
     st.session_state.sequence = sequence_input
 
-sequence = st.sidebar.text_area("Enter Protein Sequence", sequence_input, height=250)
+sequence = st.text_area("Enter Protein Sequence", sequence_input, height=250)
 
-# ✅ Example Proteins Gallery (Clickable Cards)
-st.sidebar.subheader("Example Proteins Gallery")
+# ✅ Example Proteins Gallery (Clickable Cards on the Main Page)
+st.subheader("Example Proteins Gallery")
 
 def on_click_sequence(seq):
     st.session_state.sequence = seq
@@ -82,15 +82,7 @@ example_proteins = [
 ]
 
 for name, seq in example_proteins:
-    st.sidebar.markdown(
-        f"""
-        <div style="background-color: #f0f8ff; padding: 15px; border-radius: 10px; cursor: pointer; text-align: center;"
-             onclick="window.parent.streamlit.setComponentValue({{ 'sequence': '{seq}' }})">
-            <h5 style="color: #333;">{name}</h5>
-        </div>
-        """, unsafe_allow_html=True
-    )
-    if st.sidebar.button(f"Select {name}"):
+    if st.button(f"Select {name}"):
         on_click_sequence(seq)
 
 st.sidebar.title("🔧 Visualization Options")
