@@ -283,10 +283,12 @@ with st.sidebar:
     predict_clicked = st.button("Predict Structure", key="predict_button", type="primary")
     reset = st.button("Reset", key="reset")
 
+    # FIXED RESET BUTTON HANDLER: Clear session state keys without using deprecated rerun
     if reset:
-        for key in st.session_state.keys():
+        keys_to_clear = list(st.session_state.keys())
+        for key in keys_to_clear:
             del st.session_state[key]
-        st.experimental_rerun()
+        # No st.experimental_rerun() call here; Streamlit will rerun automatically due to state change
 
 # ====== FUNCTION TO RUN PREDICTION AND SET STATE ======
 def run_prediction_for_sequence(seq):
@@ -354,7 +356,7 @@ else:
     spin = st.session_state.spin
     
     # Also handle sidebar predict button click
-    if 'predict_button' in st.session_state and st.session_state.predict_button:
+    if predict_clicked:
         st.session_state.prediction_made = True
 
     with st.spinner('Predicting protein structure...'):
