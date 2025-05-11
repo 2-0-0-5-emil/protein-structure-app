@@ -1,3 +1,4 @@
+second last version 
 import streamlit as st
 from stmol import showmol
 import py3Dmol
@@ -48,15 +49,21 @@ body, .stApp, [data-testid="stSidebar"] {
     position: relative;
 }
 
-/* Remove the white top bar at the top of the sidebar for seamless join */
+/* Sidebar top bar white area to align with Streamlit top taskbar */
 [data-testid="stSidebar"]::before {
-    background-color: transparent !important;
-    height: 0 !important;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 48px;
+    background-color: white !important;
+    z-index: 1000;
 }
 
-/* Adjust sidebar content to not overlap the top */
+/* Adjust sidebar content to not overlap the white top bar */
 [data-testid="stSidebar"] > div:first-child {
-    margin-top: 0 !important;
+    margin-top: 48px !important;
 }
 
 /* Sidebar widget labels and inputs */
@@ -65,14 +72,8 @@ body, .stApp, [data-testid="stSidebar"] {
 [data-testid="stSidebar"] .stTextInput input, 
 [data-testid="stSidebar"] select,
 [data-testid="stSidebar"] .stCheckbox label {
-    color: #fff !important;
-    font-weight: 600;
-}
-
-/* Make the Spin Structure label bold and white */
-[data-testid="stSidebar"] .stCheckbox label {
-    color: #fff !important;
-    font-weight: 700 !important;
+    color: #f0f0f0 !important;
+    font-weight: 500;
 }
 
 /* Sidebar input fields background and border */
@@ -146,48 +147,94 @@ body, .stApp, [data-testid="stSidebar"] {
     margin-bottom: 0.3rem !important;
 }
 
-/* Custom header - joined with sidebar, no left/top radius, lifted up */
+/* Custom header */
 .custom-header {
     background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
-    margin-top: 0 !important;
-    margin-left: 0 !important;
-    padding-top: 0.7rem !important;
-    padding-bottom: 0.7rem !important;
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
-    border-radius: 0 0 12px 12px !important; /* No top or left rounding */
+    padding: 1.2rem 1.5rem 1.2rem 1.5rem;
+    border-radius: 12px;
     color: white;
-    margin-bottom: 0.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     font-family: 'Inter', sans-serif !important;
-    z-index: 10;
-    position: relative;
 }
 
-/* Remove default Streamlit main block top padding */
-.block-container {
-    padding-top: 0rem !important;
-}
-
-/* Reduce space below the protein cards and above the footer */
-.main-content {
-    position: relative;
-    z-index: 1;
-    margin-bottom: 0.5rem !important;
-}
-.protein-card {
-    margin-bottom: 0.5rem !important;
-}
+/* Footer styling */
 .custom-footer {
-    margin-top: 0.5rem !important;
-    padding: 1rem 0 !important;
+    text-align: center;
+    padding: 1.5rem;
+    margin-top: 3rem;
     color: #64748b;
     font-size: 0.9rem;
     font-family: 'Inter', sans-serif !important;
-    text-align: center;
+}
+
+/* Typography improvements */
+h1, h2, h3 {
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.4rem !important;
+}
+
+p, label {
+    font-weight: 500 !important;
+    line-height: 1.5 !important;
+    margin-bottom: 0.45rem !important;
+    font-size: 1rem !important;
+}
+
+/* Consistent and tight vertical spacing in sidebar */
+[data-testid="stSidebar"] > div > div > div {
+    margin-bottom: 0.7rem !important;
 }
 hr {margin: 0.7rem 0;}
-/* Protein card and other unchanged styles omitted for brevity, keep your existing ones */
+
+/* Protein template card styling */
+.protein-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 16px rgba(30,64,175,0.10);
+    padding: 0.8rem 0.8rem 0.8rem 0.8rem;
+    margin-bottom: 0.8rem;
+    text-align: center;
+    border: 1.5px solid #e2e8f0;
+    transition: box-shadow 0.2s;
+}
+.protein-card:hover {
+    box-shadow: 0 8px 32px rgba(30,64,175,0.18);
+}
+.protein-card img {
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    border: 1px solid #e5e7eb;
+    background: #f3f4f6;
+    max-height: 90px;
+    object-fit: contain;
+}
+.protein-card .protein-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #1e40af;
+}
+.protein-card .protein-btn {
+    background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 0.4rem 1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-top: 0.3rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.protein-card .protein-btn:hover {
+    background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
+}
+.main-content {
+    position: relative;
+    z-index: 1;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -303,12 +350,35 @@ def fetch_prediction(sequence):
 
 # ====== MAIN CONTENT AREA ======
 if not st.session_state.prediction_made:
+    # Live animated gradient background for main page only
+    st.markdown("""
+    <style>
+    .main-gradient-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -2;
+        background: linear-gradient(-45deg, #2563eb, #1e40af, #22d3ee, #f472b6);
+        background-size: 400% 400%;
+        animation: gradientBG 18s ease infinite;
+    }
+    @keyframes gradientBG {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
+    </style>
+    <div class="main-gradient-bg"></div>
+    """, unsafe_allow_html=True)
+
     st.markdown('<div class="main-content">', unsafe_allow_html=True)
 
     st.markdown("""
     <div class="custom-header">
-        <h1 style="margin: 0; font-size:2.1rem; font-weight:800;">Protein Structure Predictor</h1>
-        <p style="margin: 0.3rem 0 0; font-size: 1.05rem; opacity: 0.95;">
+        <h1 style="margin: 0;">Protein Structure Predictor</h1>
+        <p style="margin: 0.5rem 0 0; font-size: 1.1rem; opacity: 0.9;">
             Predict 3D protein structures using ESMFold's cutting-edge AI
         </p>
     </div>
@@ -411,9 +481,9 @@ else:
 # ====== FOOTER ======
 st.markdown("""
 <div class="custom-footer">
-    <hr style="border: 0.5px solid #e2e8f0; margin: 1rem 0 0 0;">
+    <hr style="border: 0.5px solid #e2e8f0; margin: 1.5rem 0;">
     <p>Protein Structure Predictor v1.0 | Powered by ESMFold API</p>
-    <p style="font-size: 0.8rem; margin-top: 0.25rem;">
+    <p style="font-size: 0.8rem; margin-top: 0.5rem;">
         For research use only | Not for clinical or diagnostic use
     </p>
 </div>
