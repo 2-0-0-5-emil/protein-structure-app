@@ -10,7 +10,7 @@ import pandas as pd
 for key, default_value in {
     "prediction_made": False,
     "sequence": "",
-    "color_scheme": "spectrum",
+    "color_scheme": "chain",  # Changed default to 'chain' for better visibility
     "spin": True,
     "plddts": []
 }.items():
@@ -49,18 +49,15 @@ body, .stApp, [data-testid="stSidebar"] {
 }
 
 /* Sidebar top bar white area to align with Streamlit top taskbar */
-/* Removed border-radius for square corners */
 [data-testid="stSidebar"]::before {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 48px; /* Approximate height of Streamlit top bar */
+    height: 48px;
     background-color: white !important;
     z-index: 1000;
-    /* border-bottom-left-radius: 8px;  Removed for square corners */
-    /* border-bottom-right-radius: 8px; Removed for square corners */
 }
 
 /* Adjust sidebar content to not overlap the white top bar */
@@ -150,7 +147,6 @@ body, .stApp, [data-testid="stSidebar"] {
 }
 
 /* Custom header */
-/* Reduced padding and margin for compactness */
 .custom-header {
     background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
     padding: 1.2rem 1.5rem 1.2rem 1.5rem;
@@ -161,14 +157,15 @@ body, .stApp, [data-testid="stSidebar"] {
     font-family: 'Inter', sans-serif !important;
 }
 
-/* Footer styling */
+/* Footer styling - improved visibility and compactness */
 .custom-footer {
     text-align: center;
-    padding: 1.5rem;
-    margin-top: 3rem;
-    color: #64748b;
-    font-size: 0.9rem;
+    padding: 0.8rem 1rem;
+    margin-top: 2rem;
+    color: #334155;  /* Dark slate color for good contrast */
+    font-size: 0.85rem;
     font-family: 'Inter', sans-serif !important;
+    line-height: 1.3;
 }
 
 /* Typography improvements */
@@ -192,7 +189,6 @@ p, label {
 hr {margin: 0.7rem 0;}
 
 /* Protein template card styling */
-/* Reduced padding and margin for compactness */
 .protein-card {
     background: #fff;
     border-radius: 14px;
@@ -211,7 +207,7 @@ hr {margin: 0.7rem 0;}
     margin-bottom: 0.5rem;
     border: 1px solid #e5e7eb;
     background: #f3f4f6;
-    max-height: 90px; /* smaller image height for compactness */
+    max-height: 90px;
     object-fit: contain;
 }
 .protein-card .protein-title {
@@ -247,7 +243,7 @@ hr {margin: 0.7rem 0;}
     height: auto;
     z-index: -1;
     object-fit: cover;
-    opacity: 0.20; /* adjust opacity as needed */
+    opacity: 0.20;
     pointer-events: none;
 }
 .main-content {
@@ -314,7 +310,7 @@ with st.sidebar:
     
     color_scheme = st.selectbox(
         "Color Scheme", 
-        ["spectrum", "chain", "residue", "secondary structure"],
+        ["chain", "spectrum", "residue", "secondary structure"],
         key="color_scheme"
     )
     
@@ -333,7 +329,7 @@ with st.sidebar:
             del st.session_state[key]
         st.session_state.prediction_made = False
         st.session_state.sequence = ""
-        st.session_state.color_scheme = "spectrum"
+        st.session_state.color_scheme = "chain"
         st.session_state.spin = True
         st.session_state.plddts = []
 
@@ -343,7 +339,7 @@ def run_prediction_for_sequence(seq):
     st.session_state.prediction_made = True
 
 # ====== HELPER FUNCTIONS ======
-def render_mol(pdb, color_scheme='spectrum', spin=True):
+def render_mol(pdb, color_scheme='chain', spin=True):
     pdbview = py3Dmol.view()
     pdbview.addModel(pdb, 'pdb')
     pdbview.setStyle({'cartoon': {'color': color_scheme}})
@@ -484,9 +480,9 @@ else:
 # ====== FOOTER ======
 st.markdown("""
 <div class="custom-footer">
-    <hr style="border: 0.5px solid #e2e8f0; margin: 1.5rem 0;">
+    <hr style="border: 0.5px solid #e2e8f0; margin: 1rem 0 0 0;">
     <p>Protein Structure Predictor v1.0 | Powered by ESMFold API</p>
-    <p style="font-size: 0.8rem; margin-top: 0.5rem;">
+    <p style="font-size: 0.8rem; margin-top: 0.25rem;">
         For research use only | Not for clinical or diagnostic use
     </p>
 </div>
